@@ -1,166 +1,32 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Player de Vídeo (Google Drive)</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f8fafc;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    input, button {
-      padding: 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-    input {
-      width: 100%;
-    }
-    .controls, .options {
-      margin-top: 10px;
+      background: #000;
       display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-    video {
-      width: 100%;
-      border-radius: 12px;
-      background: black;
-      margin-top: 15px;
-    }
-    .error {
-      color: #b91c1c;
-      margin-top: 10px;
-      font-size: 14px;
-      white-space: pre-wrap;
-    }
-    label {
-      font-size: 14px;
+    iframe {
+      width: 80%;
+      height: 80%;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>🎥 Player de Vídeo (Google Drive)</h2>
-    <p>Cole o link do Google Drive (ou apenas o FILE_ID):</p>
-    <input type="text" id="linkInput" placeholder="https://drive.google.com/file/d/FILE_ID/view?usp=sharing" />
-
-    <div class="options">
-      <label>
-        <input type="checkbox" id="useApi" /> Usar Drive API
-      </label>
-      <input type="text" id="apiKey" placeholder="Cole aqui sua API_KEY" disabled />
-    </div>
-
-    <div class="controls">
-      <button onclick="loadVideo()">Carregar vídeo</button>
-      <button onclick="togglePlay()">▶️ Play / ⏸ Pause</button>
-      <button onclick="toggleMute()">🔊 Som</button>
-      <button onclick="toggleFullscreen()">⛶ Tela cheia</button>
-    </div>
-
-    <video id="player" controlsList="nodownload"></video>
-    <div id="error" class="error"></div>
-  </div>
-
-  <script>
-    const player = document.getElementById("player");
-    const errorBox = document.getElementById("error");
-    const useApiCheckbox = document.getElementById("useApi");
-    const apiKeyInput = document.getElementById("apiKey");
-
-    useApiCheckbox.addEventListener("change", () => {
-      apiKeyInput.disabled = !useApiCheckbox.checked;
-    });
-
-    function extractFileId(input) {
-      if (!input) return "";
-      input = input.trim();
-      if (/^[A-Za-z0-9_-]{20,}$/.test(input)) return input;
-      try {
-        const url = new URL(input);
-        const path = url.pathname;
-        const params = url.searchParams;
-        const m1 = path.match(/\/file\/d\/([A-Za-z0-9_-]+)/);
-        if (m1) return m1[1];
-        if (params.get("id")) return params.get("id");
-        return "";
-      } catch {
-        return "";
-      }
-    }
-
-    async function loadVideo() {
-      const link = document.getElementById("linkInput").value;
-      const fileId = extractFileId(link);
-      if (!fileId) {
-        errorBox.textContent = "❌ Não foi possível identificar o FILE_ID. Verifique o link.";
-        return;
-      }
-
-      let src = "";
-      if (useApiCheckbox.checked) {
-        const apiKey = apiKeyInput.value.trim();
-        if (!apiKey) {
-          errorBox.textContent = "⚠️ Você marcou 'Usar API', mas não informou a API_KEY.";
-          return;
-        }
-        src = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`;
-      } else {
-        src = `https://drive.google.com/uc?export=download&id=${fileId}`;
-      }
-
-      // Testar antes com fetch para capturar status
-      try {
-        const resp = await fetch(src, { method: "GET" });
-        if (!resp.ok) {
-          const text = await resp.text();
-          errorBox.textContent = `❌ Erro ao acessar o vídeo:\nStatus: ${resp.status}\nMensagem: ${text}`;
-          return;
-        }
-      } catch (e) {
-        errorBox.textContent = `❌ Erro de rede: ${e.message}`;
-        return;
-      }
-
-      // Se passou no teste, coloca no player
-      player.src = src;
-      errorBox.textContent = "";
-      player.play().catch(err => {
-        errorBox.textContent = "⚠️ O vídeo foi carregado, mas não pôde ser reproduzido:\n" + err.message;
-      });
-    }
-
-    function togglePlay() {
-      if (player.paused) {
-        player.play();
-      } else {
-        player.pause();
-      }
-    }
-
-    function toggleMute() {
-      player.muted = !player.muted;
-    }
-
-    function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        player.requestFullscreen();
-      } else {
-        document.exitFullscreen();
-      }
-    }
-  </script>
+  <iframe 
+    src="https://drive.google.com/file/d/1cDqQq6psyYvh16-X5rLB1tyoC3_qu57W/preview" 
+    allow="autoplay"
+    allowfullscreen>
+  </iframe>
 </body>
 </html>
+
